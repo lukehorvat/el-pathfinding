@@ -7,7 +7,7 @@ module.exports = {
     open: true,
   },
   entry: {
-    app: path.join(__dirname, 'src/app.tsx'),
+    app: path.join(__dirname, 'src/index.tsx'),
   },
   output: {
     path: path.join(__dirname, 'dist'),
