@@ -7,7 +7,7 @@ module.exports = {
     open: true,
   },
   entry: {
-    app: path.join(__dirname, 'src/app.ts'),
+    app: path.join(__dirname, 'src/app.tsx'),
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -15,12 +15,12 @@ module.exports = {
     clean: true,
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js'],
   },
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.tsx?$/,
         loader: 'ts-loader',
         exclude: /node_modules/,
         options: {
