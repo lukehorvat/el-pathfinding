@@ -8,18 +8,19 @@ export const App: React.FC = () => {
 
   return (
     <>
-      <h1>EL Pathfinding</h1>
-      <select
-        name="map"
-        value={selectedMap}
-        onChange={(event) => setSelectedMap(event.target.value)}
-      >
-        {maps.map(({ name, title }) => (
-          <option key={name} value={name}>
-            {title}
-          </option>
-        ))}
-      </select>
+      <div>
+        <select
+          name="map"
+          value={selectedMap}
+          onChange={(event) => setSelectedMap(event.target.value)}
+        >
+          {maps.map(({ name, title }) => (
+            <option key={name} value={name}>
+              {title}
+            </option>
+          ))}
+        </select>
+      </div>
       {selectedMap && <Map mapName={selectedMap} />}
     </>
   );
