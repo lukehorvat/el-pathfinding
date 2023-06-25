@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Map } from './Map';
+import { MapContainer } from './Map';
 import maps from '../lib/maps';
 import './App.css';
 
@@ -21,7 +21,7 @@ export const App: React.FC = () => {
           ))}
         </select>
       </div>
-      {selectedMap && <Map mapName={selectedMap} />}
+      {selectedMap && <MapContainer mapName={selectedMap} />}
     </>
   );
 };
