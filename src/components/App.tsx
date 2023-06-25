@@ -4,7 +4,7 @@ import maps from '../lib/maps';
 import './App.css';
 
 export const App: React.FC = () => {
-  const [selectedMap, setSelectedMap] = useState<string>('startmap');
+  const [selectedMap, setSelectedMap] = useState<string>(maps[0].name);
 
   return (
     <>
