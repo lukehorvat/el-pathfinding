@@ -1,23 +1,19 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { MapData, useMap } from '../hooks/useMap';
 import { Stage, Graphics, Sprite } from '@pixi/react';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
+import { MapData, useMap } from '../hooks/useMap';
 import { findPath, Graph } from '../lib/pathfinder';
 import './Map.css';
 
 const canvasWidth = 600;
 const canvasHeight = 600;
 
-export const MapContainer: React.FC<{ mapName: string }> = ({ mapName }) => {
+export const Map: React.FC<{ mapName: string; showMapImage: boolean }> = ({
+  mapName,
+  showMapImage,
+}) => {
   const mapRequest = useMap(mapName);
-
-  if (mapRequest.isLoading) return <div>Loading map...</div>;
-  if (mapRequest.isError) return <div>Failed to load map!</div>;
-
-  return <Map map={mapRequest.data!} />;
-};
-
-export const Map: React.FC<{ map: MapData }> = ({ map }) => {
+  const map = mapRequest.data;
   const [start, setStart] = useState<{
     x: number;
     y: number;
@@ -39,15 +35,15 @@ export const Map: React.FC<{ map: MapData }> = ({ map }) => {
       const canvasY = canvasRect.bottom - event.clientY;
       const percentageX = canvasX / canvasWidth;
       const percentageY = canvasY / canvasHeight;
-      const tileX = Math.floor(percentageX * map.width);
-      const tileY = Math.floor(percentageY * map.height);
+      const tileX = Math.floor(percentageX * map!.width);
+      const tileY = Math.floor(percentageY * map!.height);
 
       if (
         tileX >= 0 &&
-        tileX < map.width &&
+        tileX < map!.width &&
         tileY >= 0 &&
-        tileY < map.height &&
-        !!map.tiles[tileX][tileY] // Is walkable?
+        tileY < map!.height &&
+        !!map!.tiles[tileX][tileY] // Is walkable?
       ) {
         if (event.shiftKey) {
           setEnd({ x: tileX, y: tileY });
@@ -59,7 +55,42 @@ export const Map: React.FC<{ map: MapData }> = ({ map }) => {
     [map]
   );
 
-  const drawUnwalkables = useCallback(
+  if (mapRequest.isLoading) return <div>Loading map...</div>;
+  if (mapRequest.isError) return <div>Failed to load map!</div>;
+
+  return (
+    <Stage
+      width={canvasWidth}
+      height={canvasHeight}
+      options={{ background: '#fff' }}
+      onClick={onClick}
+      className="map"
+    >
+      {showMapImage && <MapImage mapName={mapName} />}
+      {!showMapImage && <UnwalkableTiles map={map!} />}
+      {start && end && <PathTiles map={map!} start={start} end={end} />}
+      {start && <StartTile map={map!} start={start} />}
+      {end && <EndTile map={map!} end={end} />}
+    </Stage>
+  );
+};
+
+export const MapImage: React.FC<{ mapName: string }> = ({ mapName }) => {
+  return (
+    <Sprite
+      image={`https://raw.githubusercontent.com/lukehorvat/el-userscripts/map-images/dist/map-image-${mapName}.jpg`}
+      x={0}
+      y={0}
+      width={canvasWidth}
+      height={canvasHeight}
+    />
+  );
+};
+
+export const UnwalkableTiles: React.FC<{
+  map: MapData;
+}> = ({ map }) => {
+  const draw = useCallback(
     (g: PixiGraphics) => {
       g.clear();
 
@@ -84,95 +115,91 @@ export const Map: React.FC<{ map: MapData }> = ({ map }) => {
     [map]
   );
 
-  const drawPath = useCallback(
+  return <Graphics draw={draw} />;
+};
+
+export const StartTile: React.FC<{
+  map: MapData;
+  start: { x: number; y: number };
+}> = ({ map, start }) => {
+  const draw = useCallback(
     (g: PixiGraphics) => {
       g.clear();
 
-      if (start && end) {
-        const tileWidth = canvasWidth / map.width;
-        const tileHeight = canvasHeight / map.height;
-        const graph = new Graph(map.width, map.height, map.tiles);
-        const path = findPath(
-          graph.nodes[start.x][start.y],
-          graph.nodes[end.x][end.y]
-        );
+      const tileWidth = canvasWidth / map.width;
+      const tileHeight = canvasHeight / map.height;
 
-        for (const node of path) {
-          g.beginFill('#00ff00', 1);
-          g.drawRect(
-            node.x * tileWidth,
-            (map.height - node.y - 1) * tileHeight,
-            tileWidth,
-            tileHeight
-          );
-          g.endFill();
-        }
+      g.beginFill('#0000ff', 1);
+      g.drawRect(
+        start.x * tileWidth,
+        (map.height - start.y - 1) * tileHeight,
+        tileWidth,
+        tileHeight
+      );
+      g.endFill();
+    },
+    [map, start]
+  );
+
+  return <Graphics draw={draw} />;
+};
+
+export const EndTile: React.FC<{
+  map: MapData;
+  end: { x: number; y: number };
+}> = ({ map, end }) => {
+  const draw = useCallback(
+    (g: PixiGraphics) => {
+      g.clear();
+
+      const tileWidth = canvasWidth / map.width;
+      const tileHeight = canvasHeight / map.height;
+
+      g.beginFill('#ff0000', 1);
+      g.drawRect(
+        end.x * tileWidth,
+        (map.height - end.y - 1) * tileHeight,
+        tileWidth,
+        tileHeight
+      );
+      g.endFill();
+    },
+    [map, end]
+  );
+
+  return <Graphics draw={draw} />;
+};
+
+export const PathTiles: React.FC<{
+  map: MapData;
+  start: { x: number; y: number };
+  end: { x: number; y: number };
+}> = ({ map, start, end }) => {
+  const draw = useCallback(
+    (g: PixiGraphics) => {
+      g.clear();
+
+      const tileWidth = canvasWidth / map.width;
+      const tileHeight = canvasHeight / map.height;
+      const graph = new Graph(map.width, map.height, map.tiles);
+      const path = findPath(
+        graph.nodes[start.x][start.y],
+        graph.nodes[end.x][end.y]
+      );
+
+      for (const node of path) {
+        g.beginFill('#00ff00', 1);
+        g.drawRect(
+          node.x * tileWidth,
+          (map.height - node.y - 1) * tileHeight,
+          tileWidth,
+          tileHeight
+        );
+        g.endFill();
       }
     },
     [map, start, end]
   );
 
-  const drawStart = useCallback(
-    (g: PixiGraphics) => {
-      g.clear();
-
-      if (start) {
-        const tileWidth = canvasWidth / map.width;
-        const tileHeight = canvasHeight / map.height;
-
-        g.beginFill('#0000ff', 1);
-        g.drawRect(
-          start.x * tileWidth,
-          (map.height - start.y - 1) * tileHeight,
-          tileWidth,
-          tileHeight
-        );
-        g.endFill();
-      }
-    },
-    [map, start]
-  );
-
-  const drawEnd = useCallback(
-    (g: PixiGraphics) => {
-      g.clear();
-
-      if (end) {
-        const tileWidth = canvasWidth / map.width;
-        const tileHeight = canvasHeight / map.height;
-
-        g.beginFill('#ff0000', 1);
-        g.drawRect(
-          end.x * tileWidth,
-          (map.height - end.y - 1) * tileHeight,
-          tileWidth,
-          tileHeight
-        );
-        g.endFill();
-      }
-    },
-    [map, end]
-  );
-
-  return (
-    <Stage
-      width={canvasWidth}
-      height={canvasHeight}
-      options={{ background: '#fff' }}
-      onClick={onClick}
-      className="map"
-    >
-      {/* <Sprite
-        image={`https://raw.githubusercontent.com/lukehorvat/el-userscripts/map-images/dist/map-image-${mapName}.jpg`}
-        x={0}
-        y={0}
-        width={canvasWidth}
-        height={canvasHeight}
-      /> */}
-      <Graphics draw={drawUnwalkables} />
-      <Graphics draw={drawPath} />
-      <Graphics draw={drawStart} />
-      <Graphics draw={drawEnd} />
-    </Stage>
-  );
+  return <Graphics draw={draw} />;
 };
