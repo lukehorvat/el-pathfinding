@@ -69,8 +69,8 @@ export const Map: React.FC<{ mapName: string; showMapImage: boolean }> = ({
       {showMapImage && <MapImage mapName={mapName} />}
       {!showMapImage && <UnwalkableTiles map={map!} />}
       {start && end && <PathTiles map={map!} start={start} end={end} />}
-      {start && <StartTile map={map!} start={start} />}
-      {end && <EndTile map={map!} end={end} />}
+      {start && <StartMarker map={map!} start={start} />}
+      {end && <EndMarker map={map!} end={end} />}
     </Stage>
   );
 };
@@ -90,12 +90,11 @@ export const MapImage: React.FC<{ mapName: string }> = ({ mapName }) => {
 export const UnwalkableTiles: React.FC<{
   map: MapData;
 }> = ({ map }) => {
+  const tileWidth = canvasWidth / map.width;
+  const tileHeight = canvasHeight / map.height;
   const draw = useCallback(
     (g: PixiGraphics) => {
       g.clear();
-
-      const tileWidth = canvasWidth / map.width;
-      const tileHeight = canvasHeight / map.height;
 
       for (let x = 0; x < map.width; x++) {
         for (let y = 0; y < map.height; y++) {
@@ -118,25 +117,33 @@ export const UnwalkableTiles: React.FC<{
   return <Graphics draw={draw} />;
 };
 
-export const StartTile: React.FC<{
+export const StartMarker: React.FC<{
   map: MapData;
   start: { x: number; y: number };
 }> = ({ map, start }) => {
+  const tileWidth = canvasWidth / map.width;
+  const tileHeight = canvasHeight / map.height;
+  const markerSize = 7;
   const draw = useCallback(
     (g: PixiGraphics) => {
       g.clear();
-
-      const tileWidth = canvasWidth / map.width;
-      const tileHeight = canvasHeight / map.height;
-
-      g.beginFill('#0000ff', 1);
-      g.drawRect(
-        start.x * tileWidth,
-        (map.height - start.y - 1) * tileHeight,
-        tileWidth,
-        tileHeight
+      g.lineStyle(4, '#0000ff');
+      g.moveTo(
+        start.x * tileWidth + tileWidth / 2 - markerSize,
+        (map.height - start.y - 1) * tileHeight + tileHeight / 2 - markerSize
       );
-      g.endFill();
+      g.lineTo(
+        start.x * tileWidth + tileWidth / 2 + markerSize,
+        (map.height - start.y - 1) * tileHeight + tileHeight / 2 + markerSize
+      );
+      g.moveTo(
+        start.x * tileWidth + tileWidth / 2 + markerSize,
+        (map.height - start.y - 1) * tileHeight + tileHeight / 2 - markerSize
+      );
+      g.lineTo(
+        start.x * tileWidth + tileWidth / 2 - markerSize,
+        (map.height - start.y - 1) * tileHeight + tileHeight / 2 + markerSize
+      );
     },
     [map, start]
   );
@@ -144,25 +151,33 @@ export const StartTile: React.FC<{
   return <Graphics draw={draw} />;
 };
 
-export const EndTile: React.FC<{
+export const EndMarker: React.FC<{
   map: MapData;
   end: { x: number; y: number };
 }> = ({ map, end }) => {
+  const tileWidth = canvasWidth / map.width;
+  const tileHeight = canvasHeight / map.height;
+  const markerSize = 7;
   const draw = useCallback(
     (g: PixiGraphics) => {
       g.clear();
-
-      const tileWidth = canvasWidth / map.width;
-      const tileHeight = canvasHeight / map.height;
-
-      g.beginFill('#ff0000', 1);
-      g.drawRect(
-        end.x * tileWidth,
-        (map.height - end.y - 1) * tileHeight,
-        tileWidth,
-        tileHeight
+      g.lineStyle(4, '#ff0000');
+      g.moveTo(
+        end.x * tileWidth + tileWidth / 2 - markerSize,
+        (map.height - end.y - 1) * tileHeight + tileHeight / 2 - markerSize
       );
-      g.endFill();
+      g.lineTo(
+        end.x * tileWidth + tileWidth / 2 + markerSize,
+        (map.height - end.y - 1) * tileHeight + tileHeight / 2 + markerSize
+      );
+      g.moveTo(
+        end.x * tileWidth + tileWidth / 2 + markerSize,
+        (map.height - end.y - 1) * tileHeight + tileHeight / 2 - markerSize
+      );
+      g.lineTo(
+        end.x * tileWidth + tileWidth / 2 - markerSize,
+        (map.height - end.y - 1) * tileHeight + tileHeight / 2 + markerSize
+      );
     },
     [map, end]
   );
@@ -175,12 +190,12 @@ export const PathTiles: React.FC<{
   start: { x: number; y: number };
   end: { x: number; y: number };
 }> = ({ map, start, end }) => {
+  const tileWidth = canvasWidth / map.width;
+  const tileHeight = canvasHeight / map.height;
   const draw = useCallback(
     (g: PixiGraphics) => {
       g.clear();
 
-      const tileWidth = canvasWidth / map.width;
-      const tileHeight = canvasHeight / map.height;
       const graph = new Graph(map.width, map.height, map.tiles);
       const path = findPath(
         graph.nodes[start.x][start.y],
