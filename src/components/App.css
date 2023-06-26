@@ -6,9 +6,20 @@ body {
   color: #1f2328;
 }
 
+h3 {
+  margin-top: 0px;
+  margin-bottom: 10px;
+}
+
 form {
   display: flex;
   margin-bottom: 10px;
+}
+
+.note {
+  margin-bottom: 10px;
+  font-size: small;
+  font-style: italic;
 }
 
 .form-map-selector,

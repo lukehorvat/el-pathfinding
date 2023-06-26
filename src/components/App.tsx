@@ -22,6 +22,7 @@ export const App: React.FC = () => {
 
   return (
     <>
+      <h3>Eternal Lands pathfinding</h3>
       <form>
         <div className="form-map-selector">
           <label>Map:</label>
@@ -67,6 +68,10 @@ export const App: React.FC = () => {
           />
         </div>
       </form>
+      <div className="note">
+        Note: Click the map to set the start position; shift+click the map to
+        set the end position.
+      </div>
       {selectedMap && (
         <Map
           mapName={selectedMap}
