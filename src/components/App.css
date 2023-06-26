@@ -2,6 +2,29 @@ body {
   margin: 0px;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f6f8fa;
+  background: #e4e4e4;
   color: #1f2328;
+}
+
+form {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.form-map-selector,
+.form-map-image-toggle,
+.form-start-position {
+  margin-right: 20px;
+}
+
+.form-map-selector label,
+.form-map-image-toggle label,
+.form-start-position label,
+.form-end-position label {
+  margin-right: 5px;
+}
+
+.form-start-position input,
+.form-end-position input {
+  width: 60px;
 }
