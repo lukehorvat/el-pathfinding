@@ -46,8 +46,10 @@ export const Map: React.FC = () => {
     [map]
   );
 
-  if (map.state === 'loading') return <div>Loading map...</div>;
-  if (map.state === 'hasError') return <div>Failed to load map!</div>;
+  if (map.state == 'loading')
+    return <div className="map-loading">Loading map...</div>;
+  if (map.state === 'hasError')
+    return <div className="map-error">Failed to load map!</div>;
 
   return (
     <Stage

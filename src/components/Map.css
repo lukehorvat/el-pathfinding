@@ -2,3 +2,9 @@
   cursor: pointer;
   border: 2px solid #523a28;
 }
+
+.map-loading,
+.map-error {
+  margin-top: 150px;
+  font-size: large;
+}
