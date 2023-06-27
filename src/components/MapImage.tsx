@@ -10,7 +10,7 @@ export const MapImage: React.FC = () => {
 
   return (
     <Sprite
-      image={`https://raw.githubusercontent.com/lukehorvat/el-userscripts/map-images/dist/map-image-${mapName}.jpg`}
+      image={`https://raw.githubusercontent.com/lukehorvat/el-pathfinder/map-data/dist/map-image-${mapName}.jpg`}
       x={0}
       y={0}
       width={canvasWidth}

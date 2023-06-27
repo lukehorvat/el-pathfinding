@@ -95,7 +95,7 @@ export class Graph {
   readonly height: number;
   readonly nodes: GraphNode[][];
 
-  constructor(width: number, height: number, tiles: number[][]) {
+  constructor(width: number, height: number, walkability: number[][]) {
     this.width = width;
     this.height = height;
     this.nodes = [];
@@ -105,7 +105,7 @@ export class Graph {
       this.nodes.push(arr);
 
       for (let y = 0; y < height; y++) {
-        arr.push(new GraphNode(this, x, y, !!tiles[x][y]));
+        arr.push(new GraphNode(this, x, y, !!walkability[x][y]));
       }
     }
   }

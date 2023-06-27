@@ -24,7 +24,11 @@ export const PathfinderMapTiles: React.FC<{
 
       const tileWidth = canvasWidth / map.data.width;
       const tileHeight = canvasHeight / map.data.height;
-      const graph = new Graph(map.data.width, map.data.height, map.data.tiles);
+      const graph = new Graph(
+        map.data.width,
+        map.data.height,
+        map.data.walkability
+      );
       const path = findPath(
         graph.nodes[startTile.x][startTile.y],
         graph.nodes[endTile.x][endTile.y]
