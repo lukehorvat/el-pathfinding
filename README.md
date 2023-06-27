@@ -2,4 +2,6 @@
 
 An implementation of a pathfinder for Eternal Lands maps.
 
-https://lukehorvat.github.io/el-pathfinder/
+It uses an A* search algorithm with a "diagonal distance" cost heuristic to find the optimal path between two points on a map.
+
+Live demo [here](https://lukehorvat.github.io/el-pathfinder/).
