@@ -1,33 +1,34 @@
 import React, { useCallback } from 'react';
-import { Stage, Graphics, Sprite } from '@pixi/react';
-import { Graphics as PixiGraphics } from '@pixi/graphics';
-import { ColorSource as PixiColorSource } from '@pixi/color';
-import { MapData, useMap } from '../hooks/useMap';
-import { findPath, Graph } from '../lib/pathfinder';
+import { Stage } from '@pixi/react';
+import { useMap } from '../hooks/useMap';
+import { UnwalkableMapTiles } from './UnwalkableMapTiles';
+import { MapImage } from './MapImage';
+import { PathfinderMapTiles } from './PathfinderMapTiles';
+import { MapMarker } from './MapMarker';
 import './Map.css';
-
-const canvasWidth = 600;
-const canvasHeight = 600;
 
 export const Map: React.FC<{
   mapName: string;
-  showMapImage: boolean;
+  showUnwalkableTiles: boolean;
   startPosition: { x: number; y: number } | null;
   endPosition: { x: number; y: number } | null;
   onPositionClick: (
     position: { x: number; y: number },
     hasShiftKey: boolean
   ) => void;
+  canvasWidth: number;
+  canvasHeight: number;
 }> = ({
   mapName,
-  showMapImage,
+  showUnwalkableTiles,
   startPosition,
   endPosition,
   onPositionClick,
+  canvasWidth,
+  canvasHeight,
 }) => {
   const mapRequest = useMap(mapName);
   const map = mapRequest.data;
-
   const onClick = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
       const canvasRect = event.currentTarget.getBoundingClientRect();
@@ -62,128 +63,49 @@ export const Map: React.FC<{
       onClick={onClick}
       className="map"
     >
-      {showMapImage && <MapImage mapName={mapName} />}
-      {!showMapImage && <UnwalkableTiles map={map!} />}
+      {showUnwalkableTiles && (
+        <UnwalkableMapTiles
+          map={map!}
+          color="#222"
+          canvasWidth={canvasWidth}
+          canvasHeight={canvasHeight}
+        />
+      )}
+      {!showUnwalkableTiles && (
+        <MapImage
+          mapName={mapName}
+          canvasWidth={canvasWidth}
+          canvasHeight={canvasHeight}
+        />
+      )}
       {startPosition && endPosition && (
-        <PathTiles map={map!} start={startPosition} end={endPosition} />
+        <PathfinderMapTiles
+          map={map!}
+          startPosition={startPosition}
+          endPosition={endPosition}
+          color="#00e900"
+          canvasWidth={canvasWidth}
+          canvasHeight={canvasHeight}
+        />
       )}
       {startPosition && (
-        <MapMarker map={map!} position={startPosition} color="#0000e9" />
+        <MapMarker
+          map={map!}
+          position={startPosition}
+          color="#0000e9"
+          canvasWidth={canvasWidth}
+          canvasHeight={canvasHeight}
+        />
       )}
       {endPosition && (
-        <MapMarker map={map!} position={endPosition} color="#e90000" />
+        <MapMarker
+          map={map!}
+          position={endPosition}
+          color="#e90000"
+          canvasWidth={canvasWidth}
+          canvasHeight={canvasHeight}
+        />
       )}
     </Stage>
   );
-};
-
-export const MapImage: React.FC<{ mapName: string }> = ({ mapName }) => {
-  return (
-    <Sprite
-      image={`https://raw.githubusercontent.com/lukehorvat/el-userscripts/map-images/dist/map-image-${mapName}.jpg`}
-      x={0}
-      y={0}
-      width={canvasWidth}
-      height={canvasHeight}
-    />
-  );
-};
-
-export const UnwalkableTiles: React.FC<{
-  map: MapData;
-}> = ({ map }) => {
-  const tileWidth = canvasWidth / map.width;
-  const tileHeight = canvasHeight / map.height;
-  const draw = useCallback(
-    (g: PixiGraphics) => {
-      g.clear();
-
-      for (let x = 0; x < map.width; x++) {
-        for (let y = 0; y < map.height; y++) {
-          if (!map.tiles[x][y] /* Is not walkable? */) {
-            g.beginFill('#222', 1);
-            g.drawRect(
-              x * tileWidth,
-              (map.height - y - 1) * tileHeight,
-              tileWidth,
-              tileHeight
-            );
-            g.endFill();
-          }
-        }
-      }
-    },
-    [map]
-  );
-
-  return <Graphics draw={draw} />;
-};
-
-export const MapMarker: React.FC<{
-  map: MapData;
-  position: { x: number; y: number };
-  color: PixiColorSource;
-}> = ({ map, position, color }) => {
-  const tileWidth = canvasWidth / map.width;
-  const tileHeight = canvasHeight / map.height;
-  const markerSize = 7;
-  const draw = useCallback(
-    (g: PixiGraphics) => {
-      g.clear();
-      g.lineStyle(4, color);
-      g.moveTo(
-        position.x * tileWidth + tileWidth / 2 - markerSize,
-        (map.height - position.y - 1) * tileHeight + tileHeight / 2 - markerSize
-      );
-      g.lineTo(
-        position.x * tileWidth + tileWidth / 2 + markerSize,
-        (map.height - position.y - 1) * tileHeight + tileHeight / 2 + markerSize
-      );
-      g.moveTo(
-        position.x * tileWidth + tileWidth / 2 + markerSize,
-        (map.height - position.y - 1) * tileHeight + tileHeight / 2 - markerSize
-      );
-      g.lineTo(
-        position.x * tileWidth + tileWidth / 2 - markerSize,
-        (map.height - position.y - 1) * tileHeight + tileHeight / 2 + markerSize
-      );
-    },
-    [map, position, color]
-  );
-
-  return <Graphics draw={draw} />;
-};
-
-export const PathTiles: React.FC<{
-  map: MapData;
-  start: { x: number; y: number };
-  end: { x: number; y: number };
-}> = ({ map, start, end }) => {
-  const tileWidth = canvasWidth / map.width;
-  const tileHeight = canvasHeight / map.height;
-  const draw = useCallback(
-    (g: PixiGraphics) => {
-      g.clear();
-
-      const graph = new Graph(map.width, map.height, map.tiles);
-      const path = findPath(
-        graph.nodes[start.x][start.y],
-        graph.nodes[end.x][end.y]
-      );
-
-      for (const node of path) {
-        g.beginFill('#00e900', 1);
-        g.drawRect(
-          node.x * tileWidth,
-          (map.height - node.y - 1) * tileHeight,
-          tileWidth,
-          tileHeight
-        );
-        g.endFill();
-      }
-    },
-    [map, start, end]
-  );
-
-  return <Graphics draw={draw} />;
 };

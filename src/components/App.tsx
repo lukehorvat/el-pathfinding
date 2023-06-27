@@ -5,7 +5,8 @@ import './App.css';
 
 export const App: React.FC = () => {
   const [selectedMap, setSelectedMap] = useState<string>(maps[0].name);
-  const [showMapImage, setShowMapImage] = useState<boolean>(true);
+  const [showUnwalkableTiles, setShowUnwalkableTiles] =
+    useState<boolean>(false);
   const [startPosition, setStartPosition] = useState<{
     x: number;
     y: number;
@@ -37,12 +38,12 @@ export const App: React.FC = () => {
             ))}
           </select>
         </div>
-        <div className="form-map-image-toggle">
-          <label>Show map image:</label>
+        <div className="form-unwalkable-tiles-toggle">
+          <label>Show unwalkable tiles:</label>
           <input
             type="checkbox"
-            checked={showMapImage}
-            onChange={(event) => setShowMapImage(event.target.checked)}
+            checked={showUnwalkableTiles}
+            onChange={(event) => setShowUnwalkableTiles(event.target.checked)}
           />
         </div>
         <div className="form-start-position">
@@ -69,18 +70,20 @@ export const App: React.FC = () => {
         </div>
       </form>
       <div className="note">
-        Note: Click the map to set the start position; shift+click the map to
-        set the end position.
+        Note: To run the pathfinder, click the map to set the start position and
+        shift+click to set the end position.
       </div>
       {selectedMap && (
         <Map
           mapName={selectedMap}
-          showMapImage={showMapImage}
+          showUnwalkableTiles={showUnwalkableTiles}
           startPosition={startPosition}
           endPosition={endPosition}
           onPositionClick={(position, hasShiftKey) =>
             hasShiftKey ? setEndPosition(position) : setStartPosition(position)
           }
+          canvasWidth={600}
+          canvasHeight={600}
         />
       )}
     </>
