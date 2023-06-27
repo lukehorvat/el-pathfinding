@@ -1,42 +1,40 @@
 import React, { useCallback } from 'react';
+import { useAtomValue } from 'jotai';
 import { Graphics } from '@pixi/react';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
 import { ColorSource as PixiColorSource } from '@pixi/color';
-import { MapData } from '../hooks/useMap';
+import atoms from '../lib/atoms';
 import { findPath, Graph } from '../lib/pathfinder';
 
 export const PathfinderMapTiles: React.FC<{
-  map: MapData;
-  startPosition: { x: number; y: number };
-  endPosition: { x: number; y: number };
   color: PixiColorSource;
-  canvasWidth: number;
-  canvasHeight: number;
-}> = ({
-  map,
-  startPosition,
-  endPosition,
-  color,
-  canvasWidth,
-  canvasHeight,
-}) => {
+}> = ({ color }) => {
+  const map = useAtomValue(atoms.map);
+  const canvasWidth = useAtomValue(atoms.canvasWidth);
+  const canvasHeight = useAtomValue(atoms.canvasHeight);
+  const startPosition = useAtomValue(atoms.startPosition)!;
+  const endPosition = useAtomValue(atoms.endPosition)!;
   const draw = useCallback(
     (g: PixiGraphics) => {
-      const tileWidth = canvasWidth / map.width;
-      const tileHeight = canvasHeight / map.height;
-      const graph = new Graph(map.width, map.height, map.tiles);
+      g.clear();
+
+      if (map.state !== 'hasData') {
+        return;
+      }
+
+      const tileWidth = canvasWidth / map.data.width;
+      const tileHeight = canvasHeight / map.data.height;
+      const graph = new Graph(map.data.width, map.data.height, map.data.tiles);
       const path = findPath(
         graph.nodes[startPosition.x][startPosition.y],
         graph.nodes[endPosition.x][endPosition.y]
       );
 
-      g.clear();
-
       for (const node of path) {
         g.beginFill(color, 1);
         g.drawRect(
           node.x * tileWidth,
-          (map.height - node.y - 1) * tileHeight,
+          (map.data.height - node.y - 1) * tileHeight,
           tileWidth,
           tileHeight
         );

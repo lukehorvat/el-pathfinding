@@ -1,59 +1,53 @@
 import React, { useCallback } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
 import { Stage } from '@pixi/react';
-import { useMap } from '../hooks/useMap';
+import atoms from '../lib/atoms';
 import { UnwalkableMapTiles } from './UnwalkableMapTiles';
 import { MapImage } from './MapImage';
 import { PathfinderMapTiles } from './PathfinderMapTiles';
 import { MapMarker } from './MapMarker';
 import './Map.css';
 
-export const Map: React.FC<{
-  mapName: string;
-  showUnwalkableTiles: boolean;
-  startPosition: { x: number; y: number } | null;
-  endPosition: { x: number; y: number } | null;
-  onPositionClick: (
-    position: { x: number; y: number },
-    hasShiftKey: boolean
-  ) => void;
-  canvasWidth: number;
-  canvasHeight: number;
-}> = ({
-  mapName,
-  showUnwalkableTiles,
-  startPosition,
-  endPosition,
-  onPositionClick,
-  canvasWidth,
-  canvasHeight,
-}) => {
-  const mapRequest = useMap(mapName);
-  const map = mapRequest.data;
+export const Map: React.FC = () => {
+  const map = useAtomValue(atoms.map);
+  const showUnwalkableTiles = useAtomValue(atoms.showUnwalkableTiles);
+  const [startPosition, setStartPosition] = useAtom(atoms.startPosition);
+  const [endPosition, setEndPosition] = useAtom(atoms.endPosition);
+  const canvasWidth = useAtomValue(atoms.canvasWidth);
+  const canvasHeight = useAtomValue(atoms.canvasHeight);
   const onClick = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+      if (map.state !== 'hasData') {
+        return;
+      }
+
       const canvasRect = event.currentTarget.getBoundingClientRect();
       const canvasX = event.clientX - canvasRect.left;
       const canvasY = canvasRect.bottom - event.clientY;
       const percentageX = canvasX / canvasWidth;
       const percentageY = canvasY / canvasHeight;
-      const tileX = Math.floor(percentageX * map!.width);
-      const tileY = Math.floor(percentageY * map!.height);
+      const tileX = Math.floor(percentageX * map.data.width);
+      const tileY = Math.floor(percentageY * map.data.height);
 
       if (
         tileX >= 0 &&
-        tileX < map!.width &&
+        tileX < map.data.width &&
         tileY >= 0 &&
-        tileY < map!.height &&
-        !!map!.tiles[tileX][tileY] // Is walkable?
+        tileY < map.data.height &&
+        !!map.data.tiles[tileX][tileY] // Is walkable?
       ) {
-        onPositionClick({ x: tileX, y: tileY }, event.shiftKey);
+        if (event.shiftKey) {
+          setEndPosition({ x: tileX, y: tileY });
+        } else {
+          setStartPosition({ x: tileX, y: tileY });
+        }
       }
     },
-    [map, onPositionClick]
+    [map]
   );
 
-  if (mapRequest.isLoading) return <div>Loading map...</div>;
-  if (mapRequest.isError) return <div>Failed to load map!</div>;
+  if (map.state === 'loading') return <div>Loading map...</div>;
+  if (map.state === 'hasError') return <div>Failed to load map!</div>;
 
   return (
     <Stage
@@ -63,49 +57,10 @@ export const Map: React.FC<{
       onClick={onClick}
       className="map"
     >
-      {showUnwalkableTiles && (
-        <UnwalkableMapTiles
-          map={map!}
-          color="#222"
-          canvasWidth={canvasWidth}
-          canvasHeight={canvasHeight}
-        />
-      )}
-      {!showUnwalkableTiles && (
-        <MapImage
-          mapName={mapName}
-          canvasWidth={canvasWidth}
-          canvasHeight={canvasHeight}
-        />
-      )}
-      {startPosition && endPosition && (
-        <PathfinderMapTiles
-          map={map!}
-          startPosition={startPosition}
-          endPosition={endPosition}
-          color="#00e900"
-          canvasWidth={canvasWidth}
-          canvasHeight={canvasHeight}
-        />
-      )}
-      {startPosition && (
-        <MapMarker
-          map={map!}
-          position={startPosition}
-          color="#0000e9"
-          canvasWidth={canvasWidth}
-          canvasHeight={canvasHeight}
-        />
-      )}
-      {endPosition && (
-        <MapMarker
-          map={map!}
-          position={endPosition}
-          color="#e90000"
-          canvasWidth={canvasWidth}
-          canvasHeight={canvasHeight}
-        />
-      )}
+      {showUnwalkableTiles ? <UnwalkableMapTiles color="#222" /> : <MapImage />}
+      {startPosition && endPosition && <PathfinderMapTiles color="#00e900" />}
+      {startPosition && <MapMarker position={startPosition} color="#0000e9" />}
+      {endPosition && <MapMarker position={endPosition} color="#e90000" />}
     </Stage>
   );
 };

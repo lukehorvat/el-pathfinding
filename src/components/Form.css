@@ -1,0 +1,22 @@
+form {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+form .map-selector,
+form .unwalkable-tiles-toggle,
+form .start-position {
+  margin-right: 20px;
+}
+
+form .map-selector label,
+form .unwalkable-tiles-toggle label,
+form .start-position label,
+form .end-position label {
+  margin-right: 5px;
+}
+
+form .start-position input,
+form .end-position input {
+  width: 60px;
+}
