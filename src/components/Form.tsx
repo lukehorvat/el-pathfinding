@@ -9,8 +9,8 @@ export const Form: React.FC = () => {
   const [showUnwalkableTiles, setShowUnwalkableTiles] = useAtom(
     atoms.showUnwalkableTiles
   );
-  const [startPosition, setStartPosition] = useAtom(atoms.startPosition);
-  const [endPosition, setEndPosition] = useAtom(atoms.endPosition);
+  const [startTile, setStartTile] = useAtom(atoms.startTile);
+  const [endTile, setEndTile] = useAtom(atoms.endTile);
 
   return (
     <form>
@@ -20,8 +20,8 @@ export const Form: React.FC = () => {
           value={mapName}
           onChange={(event) => {
             setMapName(event.target.value);
-            setStartPosition(null);
-            setEndPosition(null);
+            setStartTile(null);
+            setEndTile(null);
           }}
         >
           {maps.map(({ name, title }) => (
@@ -39,21 +39,19 @@ export const Form: React.FC = () => {
           onChange={(event) => setShowUnwalkableTiles(event.target.checked)}
         />
       </div>
-      <div className="start-position">
-        <label>Start position:</label>
+      <div className="start-tile">
+        <label>Start tile:</label>
         <input
           type="text"
-          value={
-            startPosition ? `${startPosition.x},${startPosition.y}` : 'Not set'
-          }
+          value={startTile ? `${startTile.x},${startTile.y}` : 'Not set'}
           disabled
         />
       </div>
-      <div className="end-position">
-        <label>End position:</label>
+      <div className="end-tile">
+        <label>End tile:</label>
         <input
           type="text"
-          value={endPosition ? `${endPosition.x},${endPosition.y}` : 'Not set'}
+          value={endTile ? `${endTile.x},${endTile.y}` : 'Not set'}
           disabled
         />
       </div>

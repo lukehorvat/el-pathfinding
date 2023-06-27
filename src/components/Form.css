@@ -5,18 +5,18 @@ form {
 
 form .map-selector,
 form .unwalkable-tiles-toggle,
-form .start-position {
+form .start-tile {
   margin-right: 20px;
 }
 
 form .map-selector label,
 form .unwalkable-tiles-toggle label,
-form .start-position label,
-form .end-position label {
+form .start-tile label,
+form .end-tile label {
   margin-right: 5px;
 }
 
-form .start-position input,
-form .end-position input {
+form .start-tile input,
+form .end-tile input {
   width: 60px;
 }

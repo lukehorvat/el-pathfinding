@@ -14,8 +14,8 @@ const map = atom<Promise<{ width: number; height: number; tiles: number[][] }>>(
   }
 );
 const showUnwalkableTiles = atom<boolean>(false);
-const startPosition = atom<{ x: number; y: number } | null>(null);
-const endPosition = atom<{ x: number; y: number } | null>(null);
+const startTile = atom<{ x: number; y: number } | null>(null);
+const endTile = atom<{ x: number; y: number } | null>(null);
 const canvasWidth = atom<number>(600);
 const canvasHeight = atom<number>(600);
 
@@ -23,8 +23,8 @@ export default {
   mapName,
   map: loadable(map),
   showUnwalkableTiles,
-  startPosition,
-  endPosition,
+  startTile,
+  endTile,
   canvasWidth,
   canvasHeight,
 };

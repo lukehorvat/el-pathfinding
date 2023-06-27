@@ -11,8 +11,8 @@ import './Map.css';
 export const Map: React.FC = () => {
   const map = useAtomValue(atoms.map);
   const showUnwalkableTiles = useAtomValue(atoms.showUnwalkableTiles);
-  const [startPosition, setStartPosition] = useAtom(atoms.startPosition);
-  const [endPosition, setEndPosition] = useAtom(atoms.endPosition);
+  const [startTile, setStartTile] = useAtom(atoms.startTile);
+  const [endTile, setEndTile] = useAtom(atoms.endTile);
   const canvasWidth = useAtomValue(atoms.canvasWidth);
   const canvasHeight = useAtomValue(atoms.canvasHeight);
   const onClick = useCallback(
@@ -37,9 +37,9 @@ export const Map: React.FC = () => {
         !!map.data.tiles[tileX][tileY] // Is walkable?
       ) {
         if (event.shiftKey) {
-          setEndPosition({ x: tileX, y: tileY });
+          setEndTile({ x: tileX, y: tileY });
         } else {
-          setStartPosition({ x: tileX, y: tileY });
+          setStartTile({ x: tileX, y: tileY });
         }
       }
     },
@@ -58,9 +58,9 @@ export const Map: React.FC = () => {
       className="map"
     >
       {showUnwalkableTiles ? <UnwalkableMapTiles color="#222" /> : <MapImage />}
-      {startPosition && endPosition && <PathfinderMapTiles color="#00e900" />}
-      {startPosition && <MapMarker position={startPosition} color="#0000e9" />}
-      {endPosition && <MapMarker position={endPosition} color="#e90000" />}
+      {startTile && endTile && <PathfinderMapTiles color="#00e900" />}
+      {startTile && <MapMarker tile={startTile} color="#0000e9" />}
+      {endTile && <MapMarker tile={endTile} color="#e90000" />}
     </Stage>
   );
 };

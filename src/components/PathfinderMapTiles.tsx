@@ -12,8 +12,8 @@ export const PathfinderMapTiles: React.FC<{
   const map = useAtomValue(atoms.map);
   const canvasWidth = useAtomValue(atoms.canvasWidth);
   const canvasHeight = useAtomValue(atoms.canvasHeight);
-  const startPosition = useAtomValue(atoms.startPosition)!;
-  const endPosition = useAtomValue(atoms.endPosition)!;
+  const startTile = useAtomValue(atoms.startTile)!;
+  const endTile = useAtomValue(atoms.endTile)!;
   const draw = useCallback(
     (g: PixiGraphics) => {
       g.clear();
@@ -26,8 +26,8 @@ export const PathfinderMapTiles: React.FC<{
       const tileHeight = canvasHeight / map.data.height;
       const graph = new Graph(map.data.width, map.data.height, map.data.tiles);
       const path = findPath(
-        graph.nodes[startPosition.x][startPosition.y],
-        graph.nodes[endPosition.x][endPosition.y]
+        graph.nodes[startTile.x][startTile.y],
+        graph.nodes[endTile.x][endTile.y]
       );
 
       for (const node of path) {
@@ -41,7 +41,7 @@ export const PathfinderMapTiles: React.FC<{
         g.endFill();
       }
     },
-    [map, startPosition, endPosition, color, canvasWidth, canvasHeight]
+    [map, startTile, endTile, color, canvasWidth, canvasHeight]
   );
 
   return <Graphics draw={draw} />;

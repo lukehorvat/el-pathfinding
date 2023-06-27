@@ -9,8 +9,8 @@ export const App: React.FC = () => {
       <h2>Eternal Lands pathfinding</h2>
       <Form />
       <div className="note">
-        Note: To run the pathfinder, click the map to set the start position and
-        shift+click to set the end position.
+        Note: To run the pathfinder, click the map to set the start tile and
+        shift+click to set the end tile.
       </div>
       <Map />
     </div>

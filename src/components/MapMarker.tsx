@@ -6,9 +6,9 @@ import { ColorSource as PixiColorSource } from '@pixi/color';
 import atoms from '../lib/atoms';
 
 export const MapMarker: React.FC<{
-  position: { x: number; y: number };
+  tile: { x: number; y: number };
   color: PixiColorSource;
-}> = ({ position, color }) => {
+}> = ({ tile, color }) => {
   const map = useAtomValue(atoms.map);
   const canvasWidth = useAtomValue(atoms.canvasWidth);
   const canvasHeight = useAtomValue(atoms.canvasHeight);
@@ -26,31 +26,31 @@ export const MapMarker: React.FC<{
 
       g.lineStyle(4, color);
       g.moveTo(
-        position.x * tileWidth + tileWidth / 2 - markerSize,
-        (map.data.height - position.y - 1) * tileHeight +
+        tile.x * tileWidth + tileWidth / 2 - markerSize,
+        (map.data.height - tile.y - 1) * tileHeight +
           tileHeight / 2 -
           markerSize
       );
       g.lineTo(
-        position.x * tileWidth + tileWidth / 2 + markerSize,
-        (map.data.height - position.y - 1) * tileHeight +
+        tile.x * tileWidth + tileWidth / 2 + markerSize,
+        (map.data.height - tile.y - 1) * tileHeight +
           tileHeight / 2 +
           markerSize
       );
       g.moveTo(
-        position.x * tileWidth + tileWidth / 2 + markerSize,
-        (map.data.height - position.y - 1) * tileHeight +
+        tile.x * tileWidth + tileWidth / 2 + markerSize,
+        (map.data.height - tile.y - 1) * tileHeight +
           tileHeight / 2 -
           markerSize
       );
       g.lineTo(
-        position.x * tileWidth + tileWidth / 2 - markerSize,
-        (map.data.height - position.y - 1) * tileHeight +
+        tile.x * tileWidth + tileWidth / 2 - markerSize,
+        (map.data.height - tile.y - 1) * tileHeight +
           tileHeight / 2 +
           markerSize
       );
     },
-    [map, position, color, canvasWidth, canvasHeight]
+    [map, tile, color, canvasWidth, canvasHeight]
   );
 
   return <Graphics draw={draw} />;
