@@ -5,7 +5,7 @@ import maps from '../lib/maps';
 import './Form.css';
 
 export const Form: React.FC = () => {
-  const [mapName, setMapName] = useAtom(atoms.mapName);
+  const [mapFile, setMapFile] = useAtom(atoms.mapFile);
   const [showUnwalkableTiles, setShowUnwalkableTiles] = useAtom(
     atoms.showUnwalkableTiles
   );
@@ -17,16 +17,16 @@ export const Form: React.FC = () => {
       <div className="map-selector">
         <label>Map:</label>
         <select
-          value={mapName}
+          value={mapFile}
           onChange={(event) => {
-            setMapName(event.target.value);
+            setMapFile(event.target.value);
             setStartTile(null);
             setEndTile(null);
           }}
         >
-          {maps.map(({ name, title }) => (
-            <option key={name} value={name}>
-              {title}
+          {maps.map(({ file, name }) => (
+            <option key={file} value={file}>
+              {name}
             </option>
           ))}
         </select>

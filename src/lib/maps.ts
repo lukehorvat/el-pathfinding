@@ -1,26 +1,26 @@
 export default [
   {
-    name: 'startmap',
-    title: 'Isla Prima',
+    file: 'startmap',
+    name: 'Isla Prima',
   },
   {
-    name: 'map3',
-    title: 'Desert Pines',
+    file: 'map3',
+    name: 'Desert Pines',
   },
   {
-    name: 'map8',
-    title: 'Naralik',
+    file: 'map8',
+    name: 'Naralik',
   },
   {
-    name: 'anitora',
-    title: 'Port Anitora',
+    file: 'anitora',
+    name: 'Port Anitora',
   },
   {
-    name: 'cont2map1',
-    title: 'Idaloran',
+    file: 'cont2map1',
+    name: 'Idaloran',
   },
   {
-    name: 'cont2map18',
-    title: 'Trassian',
+    file: 'cont2map18',
+    name: 'Trassian',
   },
 ];

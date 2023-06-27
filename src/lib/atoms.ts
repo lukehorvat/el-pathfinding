@@ -2,13 +2,13 @@ import { atom } from 'jotai';
 import { loadable } from 'jotai/utils';
 import maps from './maps';
 
-const mapName = atom<string>(maps[0].name);
+const mapFile = atom<string>(maps[0].file);
 const map = atom<
   Promise<{ width: number; height: number; walkability: number[][] }>
 >(async (get) => {
   const res = await fetch(
     `https://raw.githubusercontent.com/lukehorvat/el-pathfinder/map-data/dist/map-walkability-${get(
-      mapName
+      mapFile
     )}.json`
   );
   return res.json();
@@ -20,7 +20,7 @@ const canvasWidth = atom<number>(600);
 const canvasHeight = atom<number>(600);
 
 export default {
-  mapName,
+  mapFile,
   map: loadable(map),
   showUnwalkableTiles,
   startTile,
