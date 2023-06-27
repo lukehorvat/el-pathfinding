@@ -5,14 +5,14 @@ import './App.css';
 
 export const App: React.FC = () => {
   return (
-    <>
-      <h3>Eternal Lands pathfinding</h3>
+    <div className="app">
+      <h2>Eternal Lands pathfinding</h2>
       <Form />
       <div className="note">
         Note: To run the pathfinder, click the map to set the start position and
         shift+click to set the end position.
       </div>
       <Map />
-    </>
+    </div>
   );
 };
