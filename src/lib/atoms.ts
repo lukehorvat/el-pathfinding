@@ -6,7 +6,7 @@ const mapName = atom<string>(maps[0].name);
 const map = atom<Promise<{ width: number; height: number; tiles: number[][] }>>(
   async (get) => {
     const res = await fetch(
-      `https://raw.githubusercontent.com/lukehorvat/el-pathfinding/map-data/dist/${get(
+      `https://raw.githubusercontent.com/lukehorvat/el-pathfinder/map-data/dist/${get(
         mapName
       )}.json`
     );
