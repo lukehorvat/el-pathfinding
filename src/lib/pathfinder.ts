@@ -1,5 +1,5 @@
-const DIAGONAL_MOVEMENT_COST = Math.sqrt(2);
-const NONDIAGONAL_MOVEMENT_COST = 1;
+const DIAGONAL_MOVEMENT_COST = 14;
+const NONDIAGONAL_MOVEMENT_COST = 10;
 
 /**
  * An A* search algorithm-based pathfinder for EL maps.
