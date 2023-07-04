@@ -1,3 +1,6 @@
+const DIAGONAL_MOVEMENT_COST = Math.sqrt(2);
+const NONDIAGONAL_MOVEMENT_COST = 1;
+
 /**
  * An A* search algorithm-based pathfinder for EL maps.
  */
@@ -11,7 +14,7 @@ export function findPath(fromNode: GraphNode, toNode: GraphNode): GraphNode[] {
 
   openSet.add(fromNode);
   gScores.set(fromNode, 0);
-  hScores.set(fromNode, getCostHeuristic(fromNode, toNode));
+  hScores.set(fromNode, getHeuristicCost(fromNode, toNode));
   fScores.set(fromNode, hScores.get(fromNode)!);
 
   while (openSet.size > 0) {
@@ -24,13 +27,12 @@ export function findPath(fromNode: GraphNode, toNode: GraphNode): GraphNode[] {
     openSet.delete(node);
     closedSet.add(node);
 
-    for (const neighbour of node.neighbours) {
-      if (closedSet.has(neighbour)) {
+    for (const [direction, neighbour] of node.neighbours) {
+      if (closedSet.has(neighbour) || !neighbour.walkable) {
         continue;
       }
 
-      const tentativeGScore =
-        gScores.get(node)! + getCostHeuristic(node, neighbour);
+      const tentativeGScore = gScores.get(node)! + getMovementCost(direction);
 
       if (openSet.has(neighbour) && gScores.get(neighbour)! < tentativeGScore) {
         continue;
@@ -38,13 +40,46 @@ export function findPath(fromNode: GraphNode, toNode: GraphNode): GraphNode[] {
 
       openSet.add(neighbour);
       gScores.set(neighbour, tentativeGScore);
-      hScores.set(neighbour, getCostHeuristic(neighbour, toNode));
+      hScores.set(neighbour, getHeuristicCost(neighbour, toNode));
       fScores.set(neighbour, gScores.get(neighbour)! + hScores.get(neighbour)!);
       backtrack.set(neighbour, node);
     }
   }
 
   return [];
+}
+
+/**
+ * Get the actual cost of moving one node in a particular direction.
+ */
+function getMovementCost(direction: GraphDirection): number {
+  switch (direction) {
+    case GraphDirection.WEST:
+    case GraphDirection.EAST:
+    case GraphDirection.SOUTH:
+    case GraphDirection.NORTH:
+      return NONDIAGONAL_MOVEMENT_COST;
+    case GraphDirection.SOUTHWEST:
+    case GraphDirection.NORTHWEST:
+    case GraphDirection.SOUTHEAST:
+    case GraphDirection.NORTHEAST:
+      return DIAGONAL_MOVEMENT_COST;
+  }
+}
+
+/**
+ * Estimate the cost of moving from one node to another. Uses the "octile distance" heuristic.
+ *
+ * See: https://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#diagonal-distance
+ */
+function getHeuristicCost(fromNode: GraphNode, toNode: GraphNode): number {
+  const dx = Math.abs(fromNode.x - toNode.x);
+  const dy = Math.abs(fromNode.y - toNode.y);
+
+  return (
+    NONDIAGONAL_MOVEMENT_COST * (dx + dy) +
+    (DIAGONAL_MOVEMENT_COST - 2 * NONDIAGONAL_MOVEMENT_COST) * Math.min(dx, dy)
+  );
 }
 
 function getLowestCostNode(
@@ -60,19 +95,6 @@ function getLowestCostNode(
   }
 
   return lowestCostNode!;
-}
-
-/**
- * Use the "diagonal distance" heuristic to estimate the distance from one node to another.
- */
-function getCostHeuristic(fromNode: GraphNode, toNode: GraphNode): number {
-  const xDistance = Math.abs(fromNode.x - toNode.x);
-  const yDistance = Math.abs(fromNode.y - toNode.y);
-  if (xDistance > yDistance) {
-    return 14 * yDistance + 10 * (xDistance - yDistance);
-  } else {
-    return 14 * xDistance + 10 * (yDistance - xDistance);
-  }
 }
 
 function reconstructPath(
@@ -124,34 +146,63 @@ export class GraphNode {
     this.walkable = walkable;
   }
 
-  get neighbours(): GraphNode[] {
-    const neighbours = [];
+  get neighbours(): Map<GraphDirection, GraphNode> {
+    const neighbours = new Map();
 
     if (this.x > 0) {
-      neighbours.push(this.graph.nodes[this.x - 1][this.y]); // west
+      neighbours.set(GraphDirection.WEST, this.graph.nodes[this.x - 1][this.y]);
     }
     if (this.x < this.graph.width - 1) {
-      neighbours.push(this.graph.nodes[this.x + 1][this.y]); // east
+      neighbours.set(GraphDirection.EAST, this.graph.nodes[this.x + 1][this.y]);
     }
     if (this.y > 0) {
-      neighbours.push(this.graph.nodes[this.x][this.y - 1]); // south
+      neighbours.set(
+        GraphDirection.SOUTH,
+        this.graph.nodes[this.x][this.y - 1]
+      );
     }
     if (this.y < this.graph.height - 1) {
-      neighbours.push(this.graph.nodes[this.x][this.y + 1]); // north
+      neighbours.set(
+        GraphDirection.NORTH,
+        this.graph.nodes[this.x][this.y + 1]
+      );
     }
     if (this.x > 0 && this.y > 0) {
-      neighbours.push(this.graph.nodes[this.x - 1][this.y - 1]); // south-west
+      neighbours.set(
+        GraphDirection.SOUTHWEST,
+        this.graph.nodes[this.x - 1][this.y - 1]
+      );
     }
     if (this.x > 0 && this.y < this.graph.height - 1) {
-      neighbours.push(this.graph.nodes[this.x - 1][this.y + 1]); // north-west
+      neighbours.set(
+        GraphDirection.NORTHWEST,
+        this.graph.nodes[this.x - 1][this.y + 1]
+      );
     }
     if (this.x < this.graph.width - 1 && this.y > 0) {
-      neighbours.push(this.graph.nodes[this.x + 1][this.y - 1]); // south-east
+      neighbours.set(
+        GraphDirection.SOUTHEAST,
+        this.graph.nodes[this.x + 1][this.y - 1]
+      );
     }
     if (this.x < this.graph.width - 1 && this.y < this.graph.height - 1) {
-      neighbours.push(this.graph.nodes[this.x + 1][this.y + 1]); // north-east
+      neighbours.set(
+        GraphDirection.NORTHEAST,
+        this.graph.nodes[this.x + 1][this.y + 1]
+      );
     }
 
-    return neighbours.filter((neighbour) => neighbour.walkable);
+    return neighbours;
   }
+}
+
+enum GraphDirection {
+  WEST,
+  EAST,
+  SOUTH,
+  NORTH,
+  SOUTHWEST,
+  NORTHWEST,
+  SOUTHEAST,
+  NORTHEAST,
 }
