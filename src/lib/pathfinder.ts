@@ -10,18 +10,18 @@ export function findPath(fromNode: GraphNode, toNode: GraphNode): GraphNode[] {
   const gScores = new Map<GraphNode, number>();
   const hScores = new Map<GraphNode, number>();
   const fScores = new Map<GraphNode, number>();
-  const backtrack: Map<GraphNode, GraphNode> = new Map();
+  const backtrack = new Map<GraphNode, GraphNode>();
 
   openSet.add(fromNode);
   gScores.set(fromNode, 0);
   hScores.set(fromNode, getHeuristicCost(fromNode, toNode));
-  fScores.set(fromNode, hScores.get(fromNode)!);
+  fScores.set(fromNode, gScores.get(fromNode)! + hScores.get(fromNode)!);
 
   while (openSet.size > 0) {
     const node: GraphNode = getLowestCostNode(openSet, fScores);
 
     if (node === toNode) {
-      return reconstructPath(toNode, backtrack);
+      return reconstructPath(node, backtrack);
     }
 
     openSet.delete(node);
