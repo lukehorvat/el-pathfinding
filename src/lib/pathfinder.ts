@@ -1,3 +1,5 @@
+import { MapInfo } from './maps';
+
 const DIAGONAL_MOVEMENT_COST = 14;
 const NONDIAGONAL_MOVEMENT_COST = 10;
 
@@ -5,9 +7,13 @@ const NONDIAGONAL_MOVEMENT_COST = 10;
  * An A* search algorithm-based pathfinder for EL maps.
  */
 export function findPath(
-  fromNode: GraphNode,
-  toNode: GraphNode
+  mapInfo: MapInfo,
+  startTile: { x: number; y: number },
+  endTile: { x: number; y: number }
 ): GraphNode[] | null {
+  const graph = new Graph(mapInfo);
+  const startNode = graph.nodes[startTile.x][startTile.y];
+  const endNode = graph.nodes[endTile.x][endTile.y];
   const closedSet = new Set<GraphNode>(); // Set of nodes already evaluated.
   const openSet = new Set<GraphNode>(); // Set of tentative nodes to be evaluated.
   const gScores = new Map<GraphNode, number>();
@@ -15,15 +21,15 @@ export function findPath(
   const fScores = new Map<GraphNode, number>();
   const backtrack = new Map<GraphNode, GraphNode>();
 
-  openSet.add(fromNode);
-  gScores.set(fromNode, 0);
-  hScores.set(fromNode, getHeuristicCost(fromNode, toNode));
-  fScores.set(fromNode, gScores.get(fromNode)! + hScores.get(fromNode)!);
+  openSet.add(startNode);
+  gScores.set(startNode, 0);
+  hScores.set(startNode, getHeuristicCost(startNode, endNode));
+  fScores.set(startNode, gScores.get(startNode)! + hScores.get(startNode)!);
 
   while (openSet.size > 0) {
     const node: GraphNode = getLowestCostNode(openSet, fScores);
 
-    if (node === toNode) {
+    if (node === endNode) {
       return reconstructPath(node, backtrack);
     }
 
@@ -43,7 +49,7 @@ export function findPath(
 
       openSet.add(neighbour);
       gScores.set(neighbour, tentativeGScore);
-      hScores.set(neighbour, getHeuristicCost(neighbour, toNode));
+      hScores.set(neighbour, getHeuristicCost(neighbour, endNode));
       fScores.set(neighbour, gScores.get(neighbour)! + hScores.get(neighbour)!);
       backtrack.set(neighbour, node);
     }
@@ -115,28 +121,28 @@ function reconstructPath(
   return path;
 }
 
-export class Graph {
+class Graph {
   readonly width: number;
   readonly height: number;
   readonly nodes: GraphNode[][];
 
-  constructor(width: number, height: number, walkability: boolean[][]) {
-    this.width = width;
-    this.height = height;
+  constructor(mapInfo: MapInfo) {
+    this.width = mapInfo.width;
+    this.height = mapInfo.height;
     this.nodes = [];
 
-    for (let x = 0; x < width; x++) {
+    for (let x = 0; x < mapInfo.width; x++) {
       const arr: GraphNode[] = [];
       this.nodes.push(arr);
 
-      for (let y = 0; y < height; y++) {
-        arr.push(new GraphNode(this, x, y, !!walkability[x][y]));
+      for (let y = 0; y < mapInfo.height; y++) {
+        arr.push(new GraphNode(this, x, y, mapInfo.walkability[x][y]));
       }
     }
   }
 }
 
-export class GraphNode {
+class GraphNode {
   readonly graph: Graph;
   readonly x: number;
   readonly y: number;
