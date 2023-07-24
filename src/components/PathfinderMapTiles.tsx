@@ -34,15 +34,17 @@ export const PathfinderMapTiles: React.FC<{
         graph.nodes[endTile.x][endTile.y]
       );
 
-      for (const node of path) {
-        g.beginFill(color, 1);
-        g.drawRect(
-          node.x * tileWidth,
-          (mapInfo.data.height - node.y - 1) * tileHeight,
-          tileWidth,
-          tileHeight
-        );
-        g.endFill();
+      if (path) {
+        for (const node of path) {
+          g.beginFill(color, 1);
+          g.drawRect(
+            node.x * tileWidth,
+            (mapInfo.data.height - node.y - 1) * tileHeight,
+            tileWidth,
+            tileHeight
+          );
+          g.endFill();
+        }
       }
     },
     [mapInfo, startTile, endTile, color, canvasWidth, canvasHeight]

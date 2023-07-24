@@ -4,7 +4,10 @@ const NONDIAGONAL_MOVEMENT_COST = 10;
 /**
  * An A* search algorithm-based pathfinder for EL maps.
  */
-export function findPath(fromNode: GraphNode, toNode: GraphNode): GraphNode[] {
+export function findPath(
+  fromNode: GraphNode,
+  toNode: GraphNode
+): GraphNode[] | null {
   const closedSet = new Set<GraphNode>(); // Set of nodes already evaluated.
   const openSet = new Set<GraphNode>(); // Set of tentative nodes to be evaluated.
   const gScores = new Map<GraphNode, number>();
@@ -46,7 +49,7 @@ export function findPath(fromNode: GraphNode, toNode: GraphNode): GraphNode[] {
     }
   }
 
-  return [];
+  return null;
 }
 
 /**
