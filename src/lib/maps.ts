@@ -1,4 +1,6 @@
 import pako from 'pako';
+import parseDDS from 'parse-dds';
+import decodeDXT from 'decode-dxt';
 
 export default [
   {
@@ -194,8 +196,39 @@ export async function loadMap(mapFile: string): Promise<MapInfo> {
   return { width, height, walkability };
 }
 
+/**
+ * Fetch an EL map texture file (.dds) and extract its image info.
+ */
+export async function loadMapImage(mapFile: string): Promise<MapImageInfo> {
+  // Fetch the map texture file.
+  const res = await fetch(`data/maps/${mapFile}.dds`);
+  const ddsFile = await res.arrayBuffer();
+
+  // Extract the first (largest) mipmap texture.
+  const ddsInfo = parseDDS(ddsFile);
+  const [image] = ddsInfo.images;
+  const [imageWidth, imageHeight] = image.shape;
+  const imageDataView = new DataView(ddsFile, image.offset, image.length);
+
+  // Convert the compressed DXT texture to RGBA pixel data.
+  const rgbaData = decodeDXT(
+    imageDataView,
+    imageWidth,
+    imageHeight,
+    ddsInfo.format as any
+  );
+
+  return { rgbaData, imageWidth, imageHeight };
+}
+
 export type MapInfo = {
   width: number;
   height: number;
   walkability: boolean[][];
+};
+
+export type MapImageInfo = {
+  rgbaData: Uint8Array; // An array of RGBA pixel data.
+  imageWidth: number;
+  imageHeight: number;
 };
