@@ -34,7 +34,7 @@ export const Map: React.FC = () => {
         tileX < map.data.width &&
         tileY >= 0 &&
         tileY < map.data.height &&
-        !!map.data.walkability[tileX][tileY] // Is walkable?
+        map.data.walkability[tileX][tileY] // Is walkable?
       ) {
         if (event.shiftKey) {
           setEndTile({ x: tileX, y: tileY });

@@ -1,3 +1,5 @@
+import pako from 'pako';
+
 export default [
   {
     file: 'startmap',
@@ -156,3 +158,44 @@ export default [
     name: 'Iscalrith',
   },
 ];
+
+/**
+ * Fetch an EL map file (.elm.gz) and extract its size + tile walkability info.
+ */
+export async function loadMap(mapFile: string): Promise<MapInfo> {
+  // Fetch the map file and decompress it.
+  const res = await fetch(`data/maps/${mapFile}.elm.gz`);
+  const compressedMapData = await res.arrayBuffer();
+  const mapData = Buffer.from(pako.inflate(compressedMapData));
+
+  // Read the map's size and tile walkability info.
+  const width = mapData.readUInt32LE(4) * 6;
+  const height = mapData.readUInt32LE(8) * 6;
+  const heightMapOffset = mapData.readUInt32LE(16);
+  const heightMap = mapData.subarray(
+    heightMapOffset,
+    heightMapOffset + width * height
+  );
+  const isTileValid = (x: number, y: number) =>
+    x >= 0 && x < width && y >= 0 && y < height;
+  const isTileWalkable = (x: number, y: number) =>
+    isTileValid(x, y) && (heightMap[y * width + x] & 0x3f) !== 0;
+
+  const walkability = [];
+  for (let x = 0; x < width; x++) {
+    const arr: boolean[] = [];
+    walkability.push(arr);
+
+    for (let y = 0; y < height; y++) {
+      arr.push(isTileWalkable(x, y));
+    }
+  }
+
+  return { width, height, walkability };
+}
+
+export type MapInfo = {
+  width: number;
+  height: number;
+  walkability: boolean[][];
+};

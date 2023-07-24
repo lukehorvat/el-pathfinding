@@ -1,5 +1,7 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   devServer: {
@@ -16,6 +18,9 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    fallback: {
+      buffer: require.resolve('buffer/'), // See: https://viglucci.io/how-to-polyfill-buffer-with-webpack-5
+    },
   },
   module: {
     rules: [
@@ -43,6 +48,12 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src/index.html'),
+    }),
+    new CopyWebpackPlugin({
+      patterns: [{ from: 'src/data', to: 'data' }],
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
     }),
   ],
 };

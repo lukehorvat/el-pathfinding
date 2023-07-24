@@ -117,7 +117,7 @@ export class Graph {
   readonly height: number;
   readonly nodes: GraphNode[][];
 
-  constructor(width: number, height: number, walkability: number[][]) {
+  constructor(width: number, height: number, walkability: boolean[][]) {
     this.width = width;
     this.height = height;
     this.nodes = [];

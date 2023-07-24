@@ -7,13 +7,17 @@
   "dependencies": {
     "@pixi/react": "^7.1.0",
     "jotai": "^2.2.1",
+    "pako": "^2.1.0",
     "pixi.js": "^7.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@types/pako": "^2.0.0",
     "@types/react": "^18.2.13",
     "@types/react-dom": "^18.2.6",
+    "buffer": "^6.0.3",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.2",
     "html-webpack-plugin": "^5.5.0",
     "style-loader": "^3.3.1",
