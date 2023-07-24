@@ -183,17 +183,7 @@ export async function loadMapInfo(mapFile: string): Promise<MapInfo> {
   const isTileWalkable = (x: number, y: number) =>
     isTileValid(x, y) && (heightMap[y * width + x] & 0x3f) !== 0;
 
-  const walkability = [];
-  for (let x = 0; x < width; x++) {
-    const arr: boolean[] = [];
-    walkability.push(arr);
-
-    for (let y = 0; y < height; y++) {
-      arr.push(isTileWalkable(x, y));
-    }
-  }
-
-  return { width, height, walkability };
+  return { width, height, isTileValid, isTileWalkable };
 }
 
 /**
@@ -224,7 +214,8 @@ export async function loadMapImageInfo(mapFile: string): Promise<MapImageInfo> {
 export type MapInfo = {
   width: number;
   height: number;
-  walkability: boolean[][];
+  isTileValid(x: number, y: number): boolean;
+  isTileWalkable(x: number, y: number): boolean;
 };
 
 export type MapImageInfo = {

@@ -24,7 +24,7 @@ export const UnwalkableMapTiles: React.FC<{
 
       for (let x = 0; x < mapInfo.data.width; x++) {
         for (let y = 0; y < mapInfo.data.height; y++) {
-          if (!mapInfo.data.walkability[x][y] /* Is not walkable? */) {
+          if (!mapInfo.data.isTileWalkable(x, y)) {
             g.beginFill(color, 1);
             g.drawRect(
               x * tileWidth,

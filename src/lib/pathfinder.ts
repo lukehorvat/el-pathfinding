@@ -37,7 +37,10 @@ export function findPath(
     closedSet.add(node);
 
     for (const [direction, neighbour] of node.neighbours) {
-      if (closedSet.has(neighbour) || !neighbour.walkable) {
+      if (
+        closedSet.has(neighbour) ||
+        !mapInfo.isTileWalkable(neighbour.x, neighbour.y)
+      ) {
         continue;
       }
 
@@ -136,7 +139,7 @@ class Graph {
       this.nodes.push(arr);
 
       for (let y = 0; y < mapInfo.height; y++) {
-        arr.push(new GraphNode(this, x, y, mapInfo.walkability[x][y]));
+        arr.push(new GraphNode(this, x, y));
       }
     }
   }
@@ -146,13 +149,11 @@ class GraphNode {
   readonly graph: Graph;
   readonly x: number;
   readonly y: number;
-  readonly walkable: boolean;
 
-  constructor(graph: Graph, x: number, y: number, walkable: boolean) {
+  constructor(graph: Graph, x: number, y: number) {
     this.graph = graph;
     this.x = x;
     this.y = y;
-    this.walkable = walkable;
   }
 
   get neighbours(): Map<GraphDirection, GraphNode> {
