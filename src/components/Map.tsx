@@ -9,7 +9,8 @@ import { MapMarker } from './MapMarker';
 import './Map.css';
 
 export const Map: React.FC = () => {
-  const map = useAtomValue(atoms.map);
+  const mapInfo = useAtomValue(atoms.mapInfo);
+  const mapImageInfo = useAtomValue(atoms.mapImageInfo);
   const showUnwalkableTiles = useAtomValue(atoms.showUnwalkableTiles);
   const [startTile, setStartTile] = useAtom(atoms.startTile);
   const [endTile, setEndTile] = useAtom(atoms.endTile);
@@ -17,7 +18,7 @@ export const Map: React.FC = () => {
   const canvasHeight = useAtomValue(atoms.canvasHeight);
   const onClick = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-      if (map.state !== 'hasData') {
+      if (mapInfo.state !== 'hasData') {
         return;
       }
 
@@ -26,15 +27,15 @@ export const Map: React.FC = () => {
       const canvasY = canvasRect.bottom - event.clientY;
       const percentageX = canvasX / canvasWidth;
       const percentageY = canvasY / canvasHeight;
-      const tileX = Math.floor(percentageX * map.data.width);
-      const tileY = Math.floor(percentageY * map.data.height);
+      const tileX = Math.floor(percentageX * mapInfo.data.width);
+      const tileY = Math.floor(percentageY * mapInfo.data.height);
 
       if (
         tileX >= 0 &&
-        tileX < map.data.width &&
+        tileX < mapInfo.data.width &&
         tileY >= 0 &&
-        tileY < map.data.height &&
-        map.data.walkability[tileX][tileY] // Is walkable?
+        tileY < mapInfo.data.height &&
+        mapInfo.data.walkability[tileX][tileY] // Is walkable?
       ) {
         if (event.shiftKey) {
           setEndTile({ x: tileX, y: tileY });
@@ -43,12 +44,12 @@ export const Map: React.FC = () => {
         }
       }
     },
-    [map]
+    [mapInfo]
   );
 
-  if (map.state == 'loading')
+  if (mapInfo.state == 'loading' || mapImageInfo.state == 'loading')
     return <div className="map-loading">Loading map...</div>;
-  if (map.state === 'hasError')
+  if (mapInfo.state === 'hasError' || mapImageInfo.state == 'hasError')
     return <div className="map-error">Failed to load map!</div>;
 
   return (

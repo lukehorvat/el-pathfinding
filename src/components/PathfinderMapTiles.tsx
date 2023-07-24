@@ -9,7 +9,7 @@ import { findPath, Graph } from '../lib/pathfinder';
 export const PathfinderMapTiles: React.FC<{
   color: PixiColorSource;
 }> = ({ color }) => {
-  const map = useAtomValue(atoms.map);
+  const mapInfo = useAtomValue(atoms.mapInfo);
   const canvasWidth = useAtomValue(atoms.canvasWidth);
   const canvasHeight = useAtomValue(atoms.canvasHeight);
   const startTile = useAtomValue(atoms.startTile)!;
@@ -18,16 +18,16 @@ export const PathfinderMapTiles: React.FC<{
     (g: PixiGraphics) => {
       g.clear();
 
-      if (map.state !== 'hasData') {
+      if (mapInfo.state !== 'hasData') {
         return;
       }
 
-      const tileWidth = canvasWidth / map.data.width;
-      const tileHeight = canvasHeight / map.data.height;
+      const tileWidth = canvasWidth / mapInfo.data.width;
+      const tileHeight = canvasHeight / mapInfo.data.height;
       const graph = new Graph(
-        map.data.width,
-        map.data.height,
-        map.data.walkability
+        mapInfo.data.width,
+        mapInfo.data.height,
+        mapInfo.data.walkability
       );
       const path = findPath(
         graph.nodes[startTile.x][startTile.y],
@@ -38,14 +38,14 @@ export const PathfinderMapTiles: React.FC<{
         g.beginFill(color, 1);
         g.drawRect(
           node.x * tileWidth,
-          (map.data.height - node.y - 1) * tileHeight,
+          (mapInfo.data.height - node.y - 1) * tileHeight,
           tileWidth,
           tileHeight
         );
         g.endFill();
       }
     },
-    [map, startTile, endTile, color, canvasWidth, canvasHeight]
+    [mapInfo, startTile, endTile, color, canvasWidth, canvasHeight]
   );
 
   return <Graphics draw={draw} />;

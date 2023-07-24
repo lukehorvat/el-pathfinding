@@ -164,7 +164,7 @@ export default [
 /**
  * Fetch an EL map file (.elm.gz) and extract its size + tile walkability info.
  */
-export async function loadMap(mapFile: string): Promise<MapInfo> {
+export async function loadMapInfo(mapFile: string): Promise<MapInfo> {
   // Fetch the map file and decompress it.
   const res = await fetch(`data/maps/${mapFile}.elm.gz`);
   const compressedMapData = await res.arrayBuffer();
@@ -199,7 +199,7 @@ export async function loadMap(mapFile: string): Promise<MapInfo> {
 /**
  * Fetch an EL map texture file (.dds) and extract its image info.
  */
-export async function loadMapImage(mapFile: string): Promise<MapImageInfo> {
+export async function loadMapImageInfo(mapFile: string): Promise<MapImageInfo> {
   // Fetch the map texture file.
   const res = await fetch(`data/maps/${mapFile}.dds`);
   const ddsFile = await res.arrayBuffer();

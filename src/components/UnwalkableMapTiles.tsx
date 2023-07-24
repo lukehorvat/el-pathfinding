@@ -8,27 +8,27 @@ import atoms from '../lib/atoms';
 export const UnwalkableMapTiles: React.FC<{
   color: PixiColorSource;
 }> = ({ color }) => {
-  const map = useAtomValue(atoms.map);
+  const mapInfo = useAtomValue(atoms.mapInfo);
   const canvasWidth = useAtomValue(atoms.canvasWidth);
   const canvasHeight = useAtomValue(atoms.canvasHeight);
   const draw = useCallback(
     (g: PixiGraphics) => {
       g.clear();
 
-      if (map.state !== 'hasData') {
+      if (mapInfo.state !== 'hasData') {
         return;
       }
 
-      const tileWidth = canvasWidth / map.data.width;
-      const tileHeight = canvasHeight / map.data.height;
+      const tileWidth = canvasWidth / mapInfo.data.width;
+      const tileHeight = canvasHeight / mapInfo.data.height;
 
-      for (let x = 0; x < map.data.width; x++) {
-        for (let y = 0; y < map.data.height; y++) {
-          if (!map.data.walkability[x][y] /* Is not walkable? */) {
+      for (let x = 0; x < mapInfo.data.width; x++) {
+        for (let y = 0; y < mapInfo.data.height; y++) {
+          if (!mapInfo.data.walkability[x][y] /* Is not walkable? */) {
             g.beginFill(color, 1);
             g.drawRect(
               x * tileWidth,
-              (map.data.height - y - 1) * tileHeight,
+              (mapInfo.data.height - y - 1) * tileHeight,
               tileWidth,
               tileHeight
             );
@@ -37,7 +37,7 @@ export const UnwalkableMapTiles: React.FC<{
         }
       }
     },
-    [map, color, canvasWidth, canvasHeight]
+    [mapInfo, color, canvasWidth, canvasHeight]
   );
 
   return <Graphics draw={draw} />;
