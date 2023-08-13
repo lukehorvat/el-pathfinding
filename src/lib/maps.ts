@@ -170,20 +170,33 @@ export async function loadMapInfo(mapFile: string): Promise<MapInfo> {
   const compressedMapData = await res.arrayBuffer();
   const mapData = Buffer.from(pako.inflate(compressedMapData));
 
-  // Read the map's size and tile walkability info.
-  const width = mapData.readUInt32LE(4) * 6;
-  const height = mapData.readUInt32LE(8) * 6;
-  const heightMapOffset = mapData.readUInt32LE(16);
-  const heightMap = mapData.subarray(
-    heightMapOffset,
-    heightMapOffset + width * height
+  // Read the map file header.
+  const magicToken = mapData.toString('ascii', 0, 4);
+  if (magicToken !== 'elmf') {
+    throw new Error('Not a valid map file.');
+  }
+  const tileMapWidth = mapData.readUInt32LE(4);
+  const tileMapHeight = mapData.readUInt32LE(8);
+  const elevationMapWidth = tileMapWidth * 6;
+  const elevationMapHeight = tileMapHeight * 6;
+  const elevationMapOffset = mapData.readUInt32LE(16);
+
+  // Read the tile walkability info.
+  const elevationMap = mapData.subarray(
+    elevationMapOffset,
+    elevationMapOffset + elevationMapWidth * elevationMapHeight
   );
   const isTileValid = (x: number, y: number) =>
-    x >= 0 && x < width && y >= 0 && y < height;
+    x >= 0 && x < elevationMapWidth && y >= 0 && y < elevationMapHeight;
   const isTileWalkable = (x: number, y: number) =>
-    isTileValid(x, y) && (heightMap[y * width + x] & 0x3f) !== 0;
+    isTileValid(x, y) && (elevationMap[y * elevationMapWidth + x] & 0x3f) !== 0;
 
-  return { width, height, isTileValid, isTileWalkable };
+  return {
+    width: elevationMapWidth,
+    height: elevationMapHeight,
+    isTileValid,
+    isTileWalkable,
+  };
 }
 
 /**
