@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2015",
-    "moduleResolution": "Node",
-    "module": "CommonJS",
+    "module": "ES2015",
+    "moduleResolution": "Bundler",
     "esModuleInterop": true,
     "strict": true,
     "noEmitOnError": true,
