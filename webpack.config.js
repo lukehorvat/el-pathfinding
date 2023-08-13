@@ -3,10 +3,15 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+/** @type { webpack.Configuration } */
 module.exports = {
   devServer: {
     port: 9000,
     open: true,
+    hot: false, // Doesn't work with pixi.js.
+    client: {
+      logging: 'warn',
+    },
   },
   entry: {
     app: path.join(__dirname, 'src/index.tsx'),
@@ -17,7 +22,7 @@ module.exports = {
     clean: true,
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '...'],
     fallback: {
       buffer: require.resolve('buffer/'), // See: https://viglucci.io/how-to-polyfill-buffer-with-webpack-5
     },
