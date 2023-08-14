@@ -1,4 +1,3 @@
-import pako from 'pako';
 import parseDDS from 'parse-dds';
 import decodeDXT from 'decode-dxt';
 
@@ -181,9 +180,9 @@ export function readMapInfo(mapData: Buffer): MapInfo {
     elevationMapOffset,
     elevationMapOffset + elevationMapWidth * elevationMapHeight
   );
-  const isTileValid = (x: number, y: number) =>
+  const isTileValid = (x: number, y: number): boolean =>
     x >= 0 && x < elevationMapWidth && y >= 0 && y < elevationMapHeight;
-  const isTileWalkable = (x: number, y: number) =>
+  const isTileWalkable = (x: number, y: number): boolean =>
     isTileValid(x, y) && (elevationMap[y * elevationMapWidth + x] & 0x3f) !== 0;
 
   return {
@@ -219,15 +218,15 @@ export function readMapImageInfo(textureData: Buffer): MapImageInfo {
   return { rgbaData, imageWidth, imageHeight };
 }
 
-export type MapInfo = {
+export interface MapInfo {
   width: number;
   height: number;
   isTileValid(x: number, y: number): boolean;
   isTileWalkable(x: number, y: number): boolean;
-};
+}
 
-export type MapImageInfo = {
+export interface MapImageInfo {
   rgbaData: Uint8Array; // An array of RGBA pixel data.
   imageWidth: number;
   imageHeight: number;
-};
+}

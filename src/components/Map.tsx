@@ -17,7 +17,7 @@ export const Map: React.FC = () => {
   const canvasWidth = useAtomValue(atoms.canvasWidth);
   const canvasHeight = useAtomValue(atoms.canvasHeight);
   const onClick = useCallback(
-    (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    (event: React.MouseEvent<HTMLCanvasElement>) => {
       if (mapInfo.state !== 'hasData') {
         return;
       }
@@ -44,7 +44,7 @@ export const Map: React.FC = () => {
         }
       }
     },
-    [mapInfo]
+    [mapInfo, canvasWidth, canvasHeight]
   );
 
   if (mapInfo.state == 'loading' || mapImageInfo.state == 'loading')

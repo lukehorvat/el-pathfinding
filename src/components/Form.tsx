@@ -36,7 +36,9 @@ export const Form: React.FC = () => {
         <input
           type="checkbox"
           checked={showUnwalkableTiles}
-          onChange={(event) => setShowUnwalkableTiles(event.target.checked)}
+          onChange={(event) => {
+            setShowUnwalkableTiles(event.target.checked);
+          }}
         />
       </div>
       <div className="start-tile">
