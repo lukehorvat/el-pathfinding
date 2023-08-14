@@ -162,14 +162,9 @@ export default [
 ];
 
 /**
- * Fetch an EL map file (.elm.gz) and extract its size + tile walkability info.
+ * Read an EL map definition (.elm) file and extract its size + tile walkability info.
  */
-export async function loadMapInfo(mapFile: string): Promise<MapInfo> {
-  // Fetch the map file and decompress it.
-  const res = await fetch(`data/maps/${mapFile}.elm.gz`);
-  const compressedMapData = await res.arrayBuffer();
-  const mapData = Buffer.from(pako.inflate(compressedMapData));
-
+export function readMapInfo(mapData: Buffer): MapInfo {
   // Read the map file header.
   const magicToken = mapData.toString('ascii', 0, 4);
   if (magicToken !== 'elmf') {
@@ -200,18 +195,18 @@ export async function loadMapInfo(mapFile: string): Promise<MapInfo> {
 }
 
 /**
- * Fetch an EL map texture file (.dds) and extract its image info.
+ * Read an EL map texture (.dds) file and extract its image info.
  */
-export async function loadMapImageInfo(mapFile: string): Promise<MapImageInfo> {
-  // Fetch the map texture file.
-  const res = await fetch(`data/maps/${mapFile}.dds`);
-  const ddsFile = await res.arrayBuffer();
-
+export function readMapImageInfo(textureData: Buffer): MapImageInfo {
   // Extract the first (largest) mipmap texture.
-  const ddsInfo = parseDDS(ddsFile);
+  const ddsInfo = parseDDS(textureData.buffer);
   const [image] = ddsInfo.images;
   const [imageWidth, imageHeight] = image.shape;
-  const imageDataView = new DataView(ddsFile, image.offset, image.length);
+  const imageDataView = new DataView(
+    textureData.buffer,
+    image.offset,
+    image.length
+  );
 
   // Convert the compressed DXT texture to RGBA pixel data.
   const rgbaData = decodeDXT(
