@@ -1,4 +1,4 @@
-import { MapInfo } from './maps';
+import { MapInfo } from './io';
 
 const DIAGONAL_MOVEMENT_COST = 14;
 const NONDIAGONAL_MOVEMENT_COST = 10;

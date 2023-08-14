@@ -1,12 +1,8 @@
 import { atom } from 'jotai';
 import { loadable } from 'jotai/utils';
 import pako from 'pako';
-import maps, {
-  MapImageInfo,
-  MapInfo,
-  readMapInfo,
-  readMapImageInfo,
-} from './maps';
+import maps from './maps';
+import { MapImageInfo, MapInfo, readMapInfo, readMapImageInfo } from './io';
 
 const mapFile = atom<string>(maps[0].file);
 const mapInfo = atom<Promise<MapInfo>>(async (get) => {
