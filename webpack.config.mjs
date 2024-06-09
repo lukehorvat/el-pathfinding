@@ -1,30 +1,32 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+import path from 'node:path';
+import webpack from 'webpack';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+
+const { dirname } = import.meta;
 
 /** @type { webpack.Configuration } */
-module.exports = {
+export default {
   devServer: {
     port: 9000,
     open: true,
-    hot: false, // Doesn't work with pixi.js.
+    hot: false,
     client: {
       logging: 'warn',
     },
   },
   entry: {
-    app: path.join(__dirname, 'src/index.tsx'),
+    app: path.join(dirname, 'src/index.tsx'),
   },
   output: {
-    path: path.join(__dirname, 'dist'),
+    path: path.join(dirname, 'dist'),
     filename: '[name]-[contenthash].js',
     clean: true,
   },
   resolve: {
     extensions: ['.tsx', '.ts', '...'],
     fallback: {
-      buffer: require.resolve('buffer/'), // See: https://viglucci.io/how-to-polyfill-buffer-with-webpack-5
+      buffer: import.meta.resolve('buffer/'), // See: https://viglucci.io/how-to-polyfill-buffer-with-webpack-5
     },
   },
   module: {
@@ -52,7 +54,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, 'src/index.html'),
+      template: path.join(dirname, 'src/index.html'),
     }),
     new CopyWebpackPlugin({
       patterns: [{ from: 'src/data', to: 'data' }],
