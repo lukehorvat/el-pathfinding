@@ -1,5 +1,5 @@
 .map {
-  cursor: pointer;
+  cursor: pointer !important;
   border: 2px solid #523a28;
 }
 
