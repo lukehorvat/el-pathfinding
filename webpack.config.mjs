@@ -25,9 +25,6 @@ export default {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '...'],
-    fallback: {
-      buffer: import.meta.resolve('buffer/'), // See: https://viglucci.io/how-to-polyfill-buffer-with-webpack-5
-    },
   },
   module: {
     rules: [
@@ -58,9 +55,6 @@ export default {
     }),
     new CopyWebpackPlugin({
       patterns: [{ from: 'src/data', to: 'data' }],
-    }),
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
     }),
   ],
 };

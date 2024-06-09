@@ -7,14 +7,13 @@ import { MapImageInfo, MapInfo, readMapInfo, readMapImageInfo } from './io';
 const mapFile = atom<string>(maps[0].file);
 const mapInfo = atom<Promise<MapInfo>>(async (get) => {
   const res = await fetch(`data/maps/${get(mapFile)}.elm.gz`);
-  const compressedMapData = await res.arrayBuffer();
-  const mapData = Buffer.from(pako.inflate(compressedMapData));
-  return readMapInfo(mapData);
+  const { buffer } = pako.inflate(await res.arrayBuffer());
+  return readMapInfo(buffer);
 });
 const mapImageInfo = atom<Promise<MapImageInfo>>(async (get) => {
   const res = await fetch(`data/maps/${get(mapFile)}.dds`);
-  const textureData = Buffer.from(await res.arrayBuffer());
-  return readMapImageInfo(textureData);
+  const buffer = await res.arrayBuffer();
+  return readMapImageInfo(buffer);
 });
 const showUnwalkableTiles = atom<boolean>(false);
 const startTile = atom<{ x: number; y: number } | null>(null);
